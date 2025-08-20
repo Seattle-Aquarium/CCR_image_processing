@@ -16,10 +16,9 @@ See [here](https://github.com/Seattle-Aquarium/CCR_development/blob/main/1-pager
 To provide example imagery, a folder containing 10 raw (pre-processing, .GPR), preview (pre-processing, .JPEG), and polished (processed, JPEG) can be found [here](https://github.com/zhrandell/CCR_image_processing/tree/main/example_raw_and_processed_photos). 
 
 <p float="center">
-  <img src="example_raw_and_processed_photos/input_JPEG/2024_10_08_10-37-22.JPG" width="400" height="350" />
+  <img src="https://github.com/user-attachments/assets/5ec9d885-c6c5-4bc1-b53b-c2b10bf78437" width="400" height="350" />
   <img src="example_raw_and_processed_photos/output_JPEG/2024_10_08_10-37-22.jpg" width="400" height="350" />
- </p>
-
+</p>
 
 ## General information; workflows ready to implement
 The following repos contain general information about our work, and specialized repos for ROV telemetry analyses, processing and analyses of ROV-derived benthic abundance and distribution data, and simulating benthic data.  
