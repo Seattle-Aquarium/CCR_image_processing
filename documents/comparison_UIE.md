@@ -1,17 +1,8 @@
+# SOP for Comparing UIE Output to Hand-Edited Images for Classification Training
+
+This SOP describes how to prepare matched datasets (hand-edited vs. UIE), train Ultralytics YOLO classification models in the [Toolbox](https://github.com/Jordan-Pierce/CoralNet-Toolbox) (v0.0.97), and compare model performance to evaluate image quality.
 
 
-```bibtex
-@misc{williams2025,
-  author = {Williams, Megan},
-  title = {SOP for Comparing UIE Output to Hand-Edited Images},
-  institution = {Seattle Aquarium},
-  date = {2025-12-01}
-}
-```
-
-# SOP for Comparing UIE Output to Hand-Edited Images
-
-The following steps are required to create a training dataset, train a classification model using Ultralytics YOLO in [Toolbox](https://github.com/Jordan-Pierce/CoralNet-Toolbox) (v0.0.97), and apply the model to make predictions.
 
 ## 1. Toolbox installation and setup
 
@@ -23,52 +14,61 @@ The following steps are required to create a training dataset, train a classific
 - Import images to Toolbox 
   - File → Import → Rasters → Images
 
-## 3. Import annotations 
+## 3. Import annotations for hand-edited images
 
 - Import JSON annotation file 
   - File → Import → Annotations → JSON
   - Our JSON annotations for the hand-edited imagery can be download [here][(https://www.dropbox.com/scl/fi/7rbkh40zzj7xbjx4nydoc/labelset_31.json?rlkey=7curccvmqin4ia1xqazum4h3m&dl=0)]. 
 
-## 4. Export dataset
+## 4. Export hand-edited dataset
 
 - Export hand-edited annotations into a dataset 
   - File → Export → Dataset → Classify
-  - Train/val/test ratios: 0.7/0.2/0.1 
+  - Train/val/test split: 0.7 / 0.2 / 0.1 
 
 
-## 5. Download UIE edited images
+## 5. Prepare UIE edited images
 
-- The UIE images need to be the *same* images from the hand-edited set, containing the same dimensions and image name. 
+- Ensure UIE outputs correspond **exactly** to the hand-edited images:
+  - Same filenames  
+  - Same image dimensions  
+  - Same number of images  
 
-## 6. Upload UIE images to Toolbox
+## 6. Import UIE images into Toolbox
 
-- Import images to Toolbox 
-  - File → Import → Rasters → Images
+- File → Import → Rasters → Images
 
-## 7. Import annotations from hand-edited images (same as Step 3)
+## 7.  Import the Same Annotations (Used for Hand-Edited Images)
 
 - Import JSON annotation file 
   - File → Import → Annotations → JSON
-  - Our JSON annotations for the hand-edited imagery can be download [here][(https://www.dropbox.com/scl/fi/7rbkh40zzj7xbjx4nydoc/labelset_31.json?rlkey=7curccvmqin4ia1xqazum4h3m&dl=0)]. 
+- Use the same annotation file as in Step 3: linked [here][(https://www.dropbox.com/scl/fi/7rbkh40zzj7xbjx4nydoc/labelset_31.json?rlkey=7curccvmqin4ia1xqazum4h3m&dl=0)]. 
 
 
 ## 8. Export UIE dataset
 
 - Export UIE annotations into the train folder of a dataset
   - File → Export → Dataset → Classify
-  - Train/val/test ratios: 1.0/0.0/0.0 
+  - Train/val/test split: 1.0 / 0.0 / 0.0 
+- This creates a dataset that will be re-split in Step 9 to match the hand-edited dataset in the next step.
 
 ## 9. Match UIE dataset to hand-edited dataset
 
-- Match the UIE dataset to the hand-edited dataset 
-  - Use match_dataset_split.py 
-  - This scripts tooks at every file in TEMPLATE/train/label, val/label, test/label. 
-  - Finds matching filenames in TARGET/train/label
+Use `match_dataset_split.py` to apply the same train/val/test split used for the hand-edited dataset.
+
+- The script: 
+  - Reads all files in **TEMPLATE/train/labels**, **val/labels**, **test/labels**
+  - Finds matching filenames in **TARGET/train/labels**
+  - Moves UIE files into **TARGET/train**, **TARGET/val**, **TARGET/test** so the split matches exactly
   - Moves them into TARGET/train, TARGET/val, TARGET/test so the split
    matches the template exactly
-- The result is two datasets that have the same image patches to be used to train a classification model. 
+
+Outcome:
+- Two datasets containing the *same* image patches, enabling a fair comparison of model performance.
+
 
 ## 10. Train classification models (repeat for hand-edited and UIE dataset)
+(Repeat this process once for the hand-edited dataset and once for the UIE dataset)
 
 - Start training a YOLO classification model
   - Ultralytics → Train Model → Classify
@@ -81,5 +81,33 @@ The following steps are required to create a training dataset, train a classific
 - Click OK to begin training. You can monitor training progress in the terminal.
 
 ## 11. Evaluate training results 
-- Training results can be seen in the terminal and upon the completion of the training in the location designated in Step 10. 
-- 
+
+After training completes go to the folder created for the trained model and review metrics from:
+
+`results.csv`
+
+- **Best validation Top-1 accuracy**  
+  - Does this dataset improve classification accuracy?
+
+- **Best validation Top-5 accuracy**  
+  - If Top-1 is similar but Top-5 is higher, the dataset provides “richer” information.
+
+- **Validation loss**  
+  - Lower loss at similar accuracy indicates better model calibration.
+
+`metrics_report.csv` in the test folder within the model folder
+
+- **Macro F1**  
+  - Performance across classes, treating each class equally.
+
+- **Macro Balanced Accuracy**  
+  - Mean of per-class balanced accuracy.
+
+- **Weighted F1**  
+  - Class-wise F1 weighted by sample counts.
+
+---
+
+### Optional: Automated Comparison
+
+Run `ML_metrics_comparison.py` to automatically generate a comparison table of metrics for the hand-edited vs. UIE models.
