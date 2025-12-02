@@ -1,6 +1,6 @@
 # SOP for Comparing UIE Output to Hand-Edited Images for Classification Training
 
-This SOP describes how to prepare matched datasets (hand-edited vs. UIE), train Ultralytics YOLO classification models in the [Toolbox](https://github.com/Jordan-Pierce/CoralNet-Toolbox) (v0.0.97), and compare model performance to evaluate image quality.
+This SOP describes how to prepare matched datasets (hand-edited vs. UIE), train Ultralytics YOLO classification models in [Toolbox](https://github.com/Jordan-Pierce/CoralNet-Toolbox) (v0.0.97), and compare model performance to evaluate image quality.
 
 
 
@@ -18,7 +18,7 @@ This SOP describes how to prepare matched datasets (hand-edited vs. UIE), train 
 
 - Import JSON annotation file 
   - File → Import → Annotations → JSON
-  - Our JSON annotations for the hand-edited imagery can be download [here][(https://www.dropbox.com/scl/fi/7rbkh40zzj7xbjx4nydoc/labelset_31.json?rlkey=7curccvmqin4ia1xqazum4h3m&dl=0)]. 
+  - Our JSON annotations for the hand-edited imagery can be download [here](https://www.dropbox.com/scl/fi/7rbkh40zzj7xbjx4nydoc/labelset_31.json?rlkey=7curccvmqin4ia1xqazum4h3m&dl=0). 
 
 ## 4. Export hand-edited dataset
 
@@ -42,7 +42,7 @@ This SOP describes how to prepare matched datasets (hand-edited vs. UIE), train 
 
 - Import JSON annotation file 
   - File → Import → Annotations → JSON
-- Use the same annotation file as in Step 3: linked [here][(https://www.dropbox.com/scl/fi/7rbkh40zzj7xbjx4nydoc/labelset_31.json?rlkey=7curccvmqin4ia1xqazum4h3m&dl=0)]. 
+- Use the same annotation file as in Step 3: linked [here](https://www.dropbox.com/scl/fi/7rbkh40zzj7xbjx4nydoc/labelset_31.json?rlkey=7curccvmqin4ia1xqazum4h3m&dl=0). 
 
 
 ## 8. Export UIE dataset
@@ -73,7 +73,7 @@ Outcome:
 - Start training a YOLO classification model
   - Ultralytics → Train Model → Classify
 - In the training window:
-  - Dataset: Click Browse and select the exported dataset folder.
+  - Dataset: Click Browse and select a dataset folder.
   - Model Selection: YOLO11s-cls
   - Parameters:
     - Set the location where you want your trained model to be saved.
@@ -85,28 +85,21 @@ Outcome:
 After training completes go to the folder created for the trained model and review metrics from:
 
 `results.csv`
-
 - **Best validation Top-1 accuracy**  
   - Does this dataset improve classification accuracy?
-
 - **Best validation Top-5 accuracy**  
   - If Top-1 is similar but Top-5 is higher, the dataset provides “richer” information.
-
 - **Validation loss**  
   - Lower loss at similar accuracy indicates better model calibration.
 
 `metrics_report.csv` in the test folder within the model folder
-
 - **Macro F1**  
   - Performance across classes, treating each class equally.
-
 - **Macro Balanced Accuracy**  
   - Mean of per-class balanced accuracy.
-
 - **Weighted F1**  
   - Class-wise F1 weighted by sample counts.
 
----
 
 ### Optional: Automated Comparison
 
