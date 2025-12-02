@@ -50,7 +50,7 @@ This SOP describes how to prepare matched datasets (hand-edited vs. UIE), train 
 - Export UIE annotations into the train folder of a dataset
   - File → Export → Dataset → Classify
   - Train/val/test split: 1.0 / 0.0 / 0.0 
-- This creates a dataset that will be re-split in Step 9 to match the hand-edited dataset in the next step.
+- This creates a dataset that will be re-split to match the hand-edited dataset in the next step.
 
 ## 9. Match UIE dataset to hand-edited dataset
 
