@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-compare_image_workflows_metrics.py
+ML_metrics_comparison.py
 
 Interactively compare two CoralNet-Toolbox training runs
 (e.g., Hand-edited vs UIE images) using:
