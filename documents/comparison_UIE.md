@@ -18,7 +18,7 @@ This SOP describes how to prepare matched datasets (hand-edited vs. UIE), train 
 
 - Import JSON annotation file 
   - File → Import → Annotations → JSON
-  - Our JSON annotations for the hand-edited imagery can be download [here](https://www.dropbox.com/scl/fi/7rbkh40zzj7xbjx4nydoc/labelset_31.json?rlkey=7curccvmqin4ia1xqazum4h3m&dl=0). 
+  - Our JSON annotations for the hand-edited imagery can be download [here](https://www.dropbox.com/scl/fi/n00ye2ybpo9csywqznh18/hand_edited_annotations.json?rlkey=kozunfiw9ck9986e0m1jxo348&dl=0). 
 
 ## 4. Export hand-edited dataset
 
@@ -42,7 +42,7 @@ This SOP describes how to prepare matched datasets (hand-edited vs. UIE), train 
 
 - Import JSON annotation file 
   - File → Import → Annotations → JSON
-- Use the same annotation file as in Step 3: linked [here](https://www.dropbox.com/scl/fi/7rbkh40zzj7xbjx4nydoc/labelset_31.json?rlkey=7curccvmqin4ia1xqazum4h3m&dl=0). 
+- Use the same annotation file as in Step 3: linked [here](https://www.dropbox.com/scl/fi/n00ye2ybpo9csywqznh18/hand_edited_annotations.json?rlkey=kozunfiw9ck9986e0m1jxo348&dl=0). 
 
 
 ## 8. Export UIE dataset
