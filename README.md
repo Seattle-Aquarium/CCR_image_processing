@@ -13,7 +13,7 @@ See [here](https://github.com/Seattle-Aquarium/CCR_development/blob/main/1-pager
 The latest developments on this issue come from the [Underwater Image Enhancer](https://github.com/keenanjohnson/underwater-auto-image-encoder) tool.
 The UIE allows us to leverage our set of over 6,000 hand-edited images to train in-house machine learning models that will automate image processing.
 Our training dataset and model iterations are accessible on Hugging Face [here](https://huggingface.co/Seattle-Aquarium).
-See below examples of our progress thus far.
+See below examples of our progress thus far; and track model output developments [here](https://www.dropbox.com/scl/fo/4c5l2lgexeg2obd00etlq/ACEY4P0p0Mv7A_xmAvdH0DA?rlkey=krt2s3jnjkwecua89bn33not5&dl=0).
 
 We have linked to image sets here to facilitate testing, model training, and workflow development. 
 
