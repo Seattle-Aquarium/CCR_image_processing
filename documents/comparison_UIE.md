@@ -4,6 +4,42 @@ This SOP describes how to prepare matched datasets (hand-edited vs. UIE), train 
 
 ---
 
+## Pipeline Overview
+
+```mermaid
+flowchart TD
+    subgraph HAND["Hand-Edited Dataset  (steps 2–4)"]
+        A1[Download images] --> A2[Import to Toolbox]
+        A2 --> A3[Import annotations]
+        A3 --> A4["Export dataset\n70 / 20 / 10 split"]
+    end
+
+    subgraph UIE["UIE Dataset  (steps 5–10)"]
+        B1[Prepare UIE images\nsame filenames & dimensions] --> B2[Import to Toolbox]
+        B2 --> B3[update_annotation_paths.py\nremap image paths in JSON]
+        B3 --> B4[Import updated annotations]
+        B4 --> B5["Export dataset\n100 / 0 / 0"]
+        B5 --> B6[match_dataset_split.py\napply hand-edited split]
+    end
+
+    A4 -->|template split| B6
+
+    A4 --> TRAIN_H["Train model\nYOLO11s-cls\nstep 11"]
+    B6  --> TRAIN_U["Train model\nYOLO11s-cls\n× each UIE variant  step 11"]
+
+    TRAIN_H --> EVAL_H["results.csv\nmetrics_report.csv"]
+    TRAIN_U --> EVAL_U["results.csv\nmetrics_report.csv"]
+
+    EVAL_H --> CMP{step 12\nEvaluate}
+    EVAL_U --> CMP
+
+    CMP --> ML["ML_metrics_comparison.py\nterminal · 2 models"]
+    CMP --> WB["model_comparison_workbook_w_summary.py\nExcel workbook · 2+ models"]
+    WB  --> XLSX[model_comparison.xlsx]
+```
+
+---
+
 ## 1. Toolbox Installation and Setup
 
 Instructions for installing and running Toolbox are available here:  
@@ -140,19 +176,61 @@ After training completes, examine the model output folder and review:
 
 ### `metrics_report.csv` (found in the test subfolder)
 
-- **Macro F1**  
-  → Mean performance across all classes (equal weighting)
+- **Macro F1** *(primary metric)*  
+  → Mean F1 across all classes with equal weight per class. Appropriate for imbalanced datasets because it does not inflate the score for majority classes. Zero-sample classes (e.g. `background`) are excluded from the average.
 
 - **Macro Balanced Accuracy**  
-  → Mean balanced accuracy across classes
+  → Mean balanced accuracy across classes; corroborates Macro F1.
 
-- **Weighted F1**  
-  → F1 score weighted by class sample size
+- **Per-class table (Precision / Recall / F1 / Total Samples, sorted worst-first)**  
+  → Identifies which substrate (`SU_*`) or kelp (`KE_*`) categories are hardest to classify. Classes with fewer than 10 test samples are flagged — their metrics are unreliable.
+
+> **Note:** Weighted F1 (weighted by class sample size) is *not* reported here because it is dominated by the most common categories and can mask poor performance on rare substrate or kelp species that matter ecologically.
 
 ---
 
-### Optional: Automated Comparison
+---
 
-Run `ML_metrics_comparison.py` to automatically generate a comparison table showing differences in accuracy, F1 scores, and other metrics between the hand-edited and UIE models.
+## 13. Automated Comparison Scripts
+
+Two scripts are available for comparing models. Both apply the same metric conventions: macro F1 as the primary metric, weighted F1 omitted, zero-sample classes excluded from aggregates, and classes with fewer than 10 test samples flagged as low-confidence.
+
+### `ML_metrics_comparison.py` — quick terminal comparison (2 models)
+
+Use for a fast side-by-side check of two training runs (e.g., hand-edited vs. one UIE model).
+
+**When to run:** during exploratory analysis or when comparing a single pair.
+
+**Inputs prompted:**
+- Friendly name, `results.csv`, and `metrics_report.csv` for each of the two models
+
+**Output (terminal):**
+- Aggregate summary table: Top-1, Top-5, val loss, Macro F1, Macro Balanced Accuracy; overall winner declared
+- Per-class comparison table: Precision / Recall / F1 for both models, Δ%, and winner per class — sorted by absolute F1 difference (largest gaps first)
+
+---
+
+### `model_comparison_workbook_w_summary.py` — full Excel workbook (2+ models)
+
+Use when comparing three or more models, or when a shareable report is needed.
+
+**When to run:** for final analysis across all UIE variants vs. the hand-edited baseline.
+
+**Inputs prompted:**
+1. Model name, `results.csv`, `metrics_report.csv` — repeat for each model (press Enter when done)
+2. Baseline model name (must match one entered above)
+3. Output folder for the Excel file
+
+**Output (`model_comparison.xlsx`):**
+
+| Sheet | Contents |
+|---|---|
+| **Executive Summary** | Overall winner with reason; macro accuracy/F1 per model; overfitting verdict and training suggestion; per-category winner table sorted by F1 range; head-to-head win counts; categories needing attention |
+| **training_summary** | Best epoch, Top-1/Top-5 accuracy, val loss, val–train gap |
+| **macro_summary** | Macro Precision / Recall / F1 / Balanced Accuracy per model (zero-sample classes excluded) |
+| **vs\_\<baseline\>\_\_\<model\>** | Per-class P/R/F1 for baseline and comparison model; Δ% columns; winner per class; low-sample flags |
+| **\<a\>\_vs\_\<b\>\_vs\_\<baseline\>** | Three-model side-by-side with bottleneck analysis (which of Precision or Recall is limiting each UIE model) and direct UIE-vs-UIE Δ% |
+
+All numeric columns are color-coded: green = high/improving, red = low/degrading.
 
 ---
