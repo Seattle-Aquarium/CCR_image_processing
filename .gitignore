@@ -1,2 +1,31 @@
 # OSX Files
 .DS_Store
+
+# Python files
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+*.egg-info/
+wheels/
+
+# Unit test / coverage reports
+.tox/
+.coverage
+.pytest_cache/
+.ruff_cache/
+
+# Environments
+.env
+.venv
+env/
+venv/
