@@ -61,8 +61,7 @@ Instructions for installing and running Toolbox are available here:
 - Import JSON annotation file:  
   **File → Import → Annotations → JSON**
 - Annotation file:  
-  <https://www.dropbox.com/scl/fi/n00ye2ybpo9csywqznh18/hand_edited_annotations.json?rlkey=kozunfiw9ck9986e0m1jxo348&dl=0>
-
+  <https://www.dropbox.com/scl/fi/szmbbw9goc33m3ltzutfl/hand_edited_annotations.json?rlkey=35yv4t0615yo49jg932ha619z&dl=0>
 ---
 
 ## 4. Export the Hand-Edited Dataset
