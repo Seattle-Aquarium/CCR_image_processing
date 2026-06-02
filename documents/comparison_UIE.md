@@ -50,7 +50,7 @@ Instructions for installing and running Toolbox are available here:
 ## 2. Download Hand-Edited Images
 
 - Download hand-edited images:  
-  <https://www.dropbox.com/scl/fo/j2or8e3jh99spm1hd84ws/AMI4BBG_Jfai-AsElzKYjxw?rlkey=kfy6gp1up0go9x1laoyo6lw83&dl=0>
+  <https://www.dropbox.com/scl/fo/umlj1pxafrh1yvq95yqdd/AO5Wda5BCHeFTtf0oY66Zfg?rlkey=doxnwseic0ryfur9d1zwti5zm&dl=0>
 - Import images into Toolbox:  
   **File → Import → Rasters → Images**
 
