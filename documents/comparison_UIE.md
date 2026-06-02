@@ -234,3 +234,63 @@ Use when comparing three or more models, or when a shareable report is needed.
 All numeric columns are color-coded: green = high/improving, red = low/degrading.
 
 ---
+
+## 14. One-Command Automation (`compare_uie.py`)
+
+Steps 4 and 7–13 above can be run end-to-end by a single script instead of
+clicking through the Toolbox GUI. You only provide the hand-edited annotation
+JSON and one image folder per enhancement method; the script does the rest.
+
+### What it automates
+
+| SOP steps | Automated by `compare_uie.py` |
+|---|---|
+| 4, 7–10 | Crops matched classification patches for the baseline **and** every variant using **one shared, class-stratified split** — guaranteeing identical patches across datasets without the export/remap/match-split round-trip |
+| 11 | Trains a `YOLO*-cls` model per dataset via the Ultralytics Python API |
+| 12 | Evaluates each model on the test split and writes a Toolbox-compatible `metrics_report.csv` |
+| 13 | Runs both comparison scripts: terminal table (baseline vs each variant) + `model_comparison.xlsx` |
+
+> The shared split replaces the manual `update_annotation_paths.py` +
+> `match_dataset_split.py` workflow — the *outcome* (identical patches in
+> identical splits) is the same, computed deterministically from the
+> annotation ids and a fixed seed.
+
+### Setup (virtual environment)
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Run
+
+```bash
+cp code/compare_uie.example.yaml code/my_run.local.yaml   # edit the paths
+python code/compare_uie.py code/my_run.local.yaml
+```
+
+The config lists the annotation JSON, an `output_dir`, the split, the
+hand-edited `baseline`, and one or more `variants` (each a name + image folder).
+See [`code/compare_uie.example.yaml`](../code/compare_uie.example.yaml) for the
+full annotated schema.
+
+Outputs land under `output_dir/`:
+
+```
+datasets/<name>/{train,val,test}/<label>/*.jpg   matched patch datasets
+runs/<name>/                                      Ultralytics run + results.csv
+runs/<name>/test/metrics_report.csv               per-class test metrics
+comparison/model_comparison.xlsx                   full comparison workbook
+run_manifest.json                                  paths + split summary
+```
+
+Re-run just the report from existing runs with `--reuse-datasets --reuse-runs`.
+
+> **Note:** the script reimplements the Toolbox patch-export and evaluation in
+> Python so the run is fully unattended. The patch crops follow the Toolbox
+> rules (square patch centred on `center_xy`; rectangle/polygon bounding box),
+> but if you need byte-identical parity with a specific Toolbox export, you can
+> still export from the GUI and point the comparison scripts at those folders.
+
+---
