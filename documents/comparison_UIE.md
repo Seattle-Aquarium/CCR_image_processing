@@ -14,8 +14,9 @@ flowchart TD
         A3 --> A4["Export dataset\n70 / 20 / 10 split"]
     end
 
-    subgraph UIE["UIE Dataset  (steps 5–10)"]
-        B1[Prepare UIE images\nsame filenames & dimensions] --> B2[Import to Toolbox]
+    subgraph UIE["UIE Dataset  (steps 5–11)"]
+        B1[Download denoised images\nstep 5] --> B1a[Run UIE model\nstep 6]
+        B1a --> B2[Import to Toolbox]
         B2 --> B3[update_annotation_paths.py\nremap image paths in JSON]
         B3 --> B4[Import updated annotations]
         B4 --> B5["Export dataset\n100 / 0 / 0"]
@@ -24,13 +25,13 @@ flowchart TD
 
     A4 -->|template split| B6
 
-    A4 --> TRAIN_H["Train model\nYOLO11s-cls\nstep 11"]
-    B6  --> TRAIN_U["Train model\nYOLO11s-cls\n× each UIE variant  step 11"]
+    A4 --> TRAIN_H["Train model\nYOLO11s-cls\nstep 12"]
+    B6  --> TRAIN_U["Train model\nYOLO11s-cls\n× each UIE variant  step 12"]
 
     TRAIN_H --> EVAL_H["results.csv\nmetrics_report.csv"]
     TRAIN_U --> EVAL_U["results.csv\nmetrics_report.csv"]
 
-    EVAL_H --> CMP{step 12\nEvaluate}
+    EVAL_H --> CMP{step 13\nEvaluate}
     EVAL_U --> CMP
 
     CMP --> ML["ML_metrics_comparison.py\nterminal · 2 models"]
@@ -77,6 +78,9 @@ This dataset serves as the *template* for splitting the UIE dataset.
 
 ## 5. Prepare UIE Images
 
+- Download denoised images (before UIE processing):  
+  <https://www.dropbox.com/scl/fo/8jq105ipliepvyy7u0jcs/AKsNmLaV7oNmFgbULJ-i-W4?rlkey=rasoq2000uat55jpl8pbjmu4r&st=8serhg2v&dl=0>
+
 Ensure the UIE images correspond **exactly** to the hand-edited images:
 
 - Same filenames  
@@ -85,13 +89,34 @@ Ensure the UIE images correspond **exactly** to the hand-edited images:
 
 ---
 
-## 6. Import UIE Images into Toolbox
+## 6. Create UIE-Enhanced Images
+
+Use the [underwater-auto-image-encoder](https://github.com/Seattle-Aquarium/underwater-auto-image-encoder) to run the UIE model on the denoised images downloaded in Step 5.
+
+**GUI (no programming required):**
+1. Download the desktop application and trained model (.pth file) from the repo
+2. Open the app and load the trained model checkpoint
+3. Select the folder of denoised images (from Step 5) as input
+4. Run the model — enhanced JPEGs are written to the output folder
+
+**Command line:**
+```bash
+python inference/inference.py /path/to/denoised/images \
+  --checkpoint checkpoints/best_model.pth \
+  --output /path/to/uie/output
+```
+
+Before proceeding, confirm the output images satisfy the requirements in Step 5 (same filenames, dimensions, and count as the hand-edited images).
+
+---
+
+## 7. Import UIE Images into Toolbox
 
 - **File → Import → Rasters → Images**
 
 ---
 
-## 7. Edit Hand-Edited JSON Annotation File to Point to UIE Images
+## 8. Edit Hand-Edited JSON Annotation File to Point to UIE Images
 
 Because UIE images are stored in a different folder, the annotation JSON from the hand-edited set must be updated so that every `"image_path"` points to the UIE directory.
 
@@ -109,14 +134,14 @@ The script will:
 
 ---
 
-## 8. Import the UIE Annotations
+## 9. Import the UIE Annotations
 
-- Import the updated JSON file produced in Step 7:
+- Import the updated JSON file produced in Step 8:
   - **File → Import → Annotations → JSON**
 
 ---
 
-## 9. Export the UIE Dataset
+## 10. Export the UIE Dataset
 
 Export the UIE annotations to a dataset:
 
@@ -127,7 +152,7 @@ This creates a dataset that will later be re-split to match the hand-edited data
 
 ---
 
-## 10. Match the UIE Dataset to the Hand-Edited Split
+## 11. Match the UIE Dataset to the Hand-Edited Split
 
 Use `match_dataset_split.py` to apply the same train/val/test split as the hand-edited dataset.
 
@@ -143,7 +168,7 @@ Two datasets containing the *same* image patches, enabling a fair and controlled
 
 ---
 
-## 11. Train Classification Models  
+## 12. Train Classification Models  
 *(Train once for the hand-edited dataset and once for the UIE dataset)*
 
 - Ultralytics → **Train Model → Classify**
@@ -158,7 +183,7 @@ Training progress appears in the terminal.
 
 ---
 
-## 12. Evaluate Training Results
+## 13. Evaluate Training Results
 
 After training completes, examine the model output folder and review:
 
@@ -190,7 +215,7 @@ After training completes, examine the model output folder and review:
 
 ---
 
-## 13. Automated Comparison Scripts
+## 14. Automated Comparison Scripts
 
 Two scripts are available for comparing models. Both apply the same metric conventions: macro F1 as the primary metric, weighted F1 omitted, zero-sample classes excluded from aggregates, and classes with fewer than 10 test samples flagged as low-confidence.
 
