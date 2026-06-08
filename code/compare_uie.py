@@ -110,11 +110,18 @@ def run(config_path: str, reuse_datasets: bool, reuse_runs: bool,
         report = ds.build_dataset(
             spec, annos, assignment, cfg.output_dir,
             patch_format=cfg.patch.format, patch_quality=cfg.patch.quality,
+            reference_images_dir=cfg.baseline.images_dir,
         )
         dataset_roots[spec.name] = report["root"]
         print(f"    wrote {report['written']} patches  "
               f"(train={report['counts']['train']}  "
               f"val={report['counts']['val']}  test={report['counts']['test']})")
+        align = report.get("alignment")
+        if align and align.get("mode"):
+            print(f"    note: detected '{align['mode']}' alignment vs baseline "
+                  f"({cfg.baseline.name}); remapped {report['remapped_images']} "
+                  f"image(s) of differing resolution "
+                  f"(match score {align['score']:.2f})")
         if report["missing_images"]:
             print(f"    WARNING: {len(report['missing_images'])} source image(s) "
                   f"not found in {spec.images_dir}; "

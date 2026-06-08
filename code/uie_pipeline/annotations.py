@@ -207,6 +207,36 @@ def resolve_source_image(image_name: str, image_stem: str, images_dir: str) -> s
     return None
 
 
+def map_box(box: tuple, ref_size: tuple, var_size: tuple, mode: str = "center") -> tuple:
+    """Map a box from the reference image's pixel space into a variant image's.
+
+    Annotation coordinates are expressed in the *reference* (baseline) image's
+    pixel space.  A variant image of a different resolution relates to the
+    reference in one of two ways:
+
+    * ``"scale"``  -- same field of view, resized: multiply the box by
+      ``var_size / ref_size`` (e.g. the variant was down/up-sampled).
+    * ``"center"`` -- same pixel pitch, shared centre: the variant carries a
+      symmetric border around the reference content, so translate the box by
+      ``(var - ref) / 2`` with no scaling (e.g. the baseline is a centre-crop
+      of a larger enhanced raster).
+
+    ``dataset.detect_alignment`` picks the mode empirically.  Same-size images
+    are returned unchanged under either mode.
+    """
+    rw, rh = ref_size
+    vw, vh = var_size
+    left, top, right, bottom = box
+    if not (rw and rh) or (rw, rh) == (vw, vh):
+        return box
+    if mode == "scale":
+        sx, sy = vw / rw, vh / rh
+        return (left * sx, top * sy, right * sx, bottom * sy)
+    # "center": shared centre, unit pixel scale.
+    dx, dy = (vw - rw) / 2.0, (vh - rh) / 2.0
+    return (left + dx, top + dy, right + dx, bottom + dy)
+
+
 def crop_patch(image: Image.Image, box: tuple) -> Image.Image:
     """Crop ``box`` (left, top, right, bottom) from ``image``, clamped to bounds."""
     w, h = image.size
