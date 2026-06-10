@@ -211,24 +211,23 @@ def print_comparison_table(info_a, info_b):
 
 # ---------- Main ----------
 
-def main():
-    print("Compare two CoralNet-Toolbox training runs (e.g., Hand-edited vs UIE).")
-    print("You'll be prompted for the results.csv and metrics_report.csv for each.\n")
+def compare_runs(specs):
+    """Print the terminal comparison for exactly two runs.
+
+    Importable, non-interactive entry point shared by the CLI (`main`) and the
+    automated pipeline (`compare_uie.py`).
+
+    specs: list of two dicts, each {"name", "results_path", "metrics_path"}.
+    """
+    if len(specs) != 2:
+        raise ValueError("compare_runs expects exactly two runs")
 
     dataset_infos = []
-
-    for label in ["Dataset 1", "Dataset 2"]:
-        name = input(f"\nFriendly name for {label} (e.g., 'Hand edited', 'UIE'): ").strip()
-        if not name:
-            name = label
-
-        results_path, metrics_path = prompt_dataset(label)
-
-        res_summary = summarize_results(results_path)
-        met_summary = summarize_metrics(metrics_path)
-
+    for spec in specs:
+        res_summary = summarize_results(spec["results_path"])
+        met_summary = summarize_metrics(spec["metrics_path"])
         dataset_infos.append({
-            "name": name,
+            "name": spec["name"],
             **res_summary,
             "macro_f1": met_summary["macro_f1"],
             "macro_balanced_accuracy": met_summary["macro_balanced_accuracy"],
@@ -288,6 +287,21 @@ def main():
     print(f"  >> BETTER MODEL BY CLASS COUNT: {class_winner}")
 
     print("\nDone.")
+
+
+def main():
+    print("Compare two CoralNet-Toolbox training runs (e.g., Hand-edited vs UIE).")
+    print("You'll be prompted for the results.csv and metrics_report.csv for each.\n")
+
+    specs = []
+    for label in ["Dataset 1", "Dataset 2"]:
+        name = input(f"\nFriendly name for {label} (e.g., 'Hand edited', 'UIE'): ").strip()
+        if not name:
+            name = label
+        results_path, metrics_path = prompt_dataset(label)
+        specs.append({"name": name, "results_path": results_path, "metrics_path": metrics_path})
+
+    compare_runs(specs)
 
 
 if __name__ == "__main__":
