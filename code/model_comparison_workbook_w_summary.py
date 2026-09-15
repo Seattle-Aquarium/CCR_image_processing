@@ -763,15 +763,18 @@ def prompt_models() -> List[ModelFiles]:
 
 
 # ── main ──────────────────────────────────────────────────────────────────────
-def main():
-    models = prompt_models()
-    names  = [m.name for m in models]
+def build_workbook(models: List[ModelFiles], baseline_name: str, out_dir: str) -> str:
+    """Build model_comparison.xlsx from a list of ModelFiles; return the xlsx path.
 
-    baseline_name = input("\nBaseline model name (must match one you entered): ").strip()
+    Importable, non-interactive entry point shared by the interactive CLI
+    (`main`) and the automated pipeline (`compare_uie.py`).
+    """
+    names = [m.name for m in models]
+    if len(models) < 2:
+        raise ValueError("need at least two models to compare")
     if baseline_name not in names:
         raise ValueError(f"Baseline '{baseline_name}' not in: {names}")
 
-    out_dir = input("\nOutput folder (blank = current directory): ").strip().strip('"') or os.getcwd()
     os.makedirs(out_dir, exist_ok=True)
 
     # ── load & summarise ──────────────────────────────────────────────────────
@@ -933,6 +936,19 @@ def main():
     print("\nSheets:")
     for s in wb.sheetnames:
         print(f"   • {s}")
+    return xlsx_path
+
+
+def main():
+    models = prompt_models()
+    names = [m.name for m in models]
+
+    baseline_name = input("\nBaseline model name (must match one you entered): ").strip()
+    if baseline_name not in names:
+        raise ValueError(f"Baseline '{baseline_name}' not in: {names}")
+
+    out_dir = input("\nOutput folder (blank = current directory): ").strip().strip('"') or os.getcwd()
+    build_workbook(models, baseline_name, out_dir)
 
 
 if __name__ == "__main__":

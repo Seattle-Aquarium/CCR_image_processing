@@ -29,3 +29,9 @@ wheels/
 .venv
 env/
 venv/
+
+# compare_uie.py pipeline artifacts
+# Ultralytics auto-downloaded weights
+yolo*.pt
+# Local run configs (copies of compare_uie.example.yaml) and run outputs
+code/*.local.yaml

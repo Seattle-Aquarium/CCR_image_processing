@@ -1,0 +1,17 @@
+# Dependencies for the automated UIE comparison pipeline (code/compare_uie.py)
+# Install into a virtual environment:
+#   python3 -m venv .venv
+#   source .venv/bin/activate        # Windows: .venv\Scripts\activate
+#   pip install -r requirements.txt
+
+# --- Core (dataset export, evaluation, comparison, reporting) ---
+numpy>=1.24
+pandas>=2.0
+Pillow>=10.0          # patch cropping from source rasters
+scikit-learn>=1.3     # per-class precision/recall/F1/balanced-accuracy
+PyYAML>=6.0           # YAML run config
+openpyxl>=3.1         # model_comparison.xlsx workbook
+
+# --- Training / inference (step 11) ---
+# Pulls in torch; on Apple Silicon this uses the MPS backend, otherwise CPU.
+ultralytics>=8.3.0

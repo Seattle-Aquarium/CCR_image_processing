@@ -1,0 +1,56 @@
+# =============================================================================
+# compare_uie.example.yaml
+#
+# Config for code/compare_uie.py — automates documents/comparison_UIE.md.
+# Copy this file, edit the paths, then run:
+#
+#     python code/compare_uie.py path/to/your_config.yaml
+#
+# Use absolute paths (or paths relative to where you launch the command).
+# =============================================================================
+
+# Hand-edited annotation JSON exported from the CoralNet-Toolbox
+# (File -> Export -> Annotations -> JSON). The SAME annotations are reused to
+# crop matched patches from every image folder below.
+annotations: /path/to/hand_edited_annotations.json
+
+# Where all outputs go (datasets/, runs/, comparison/, run_manifest.json).
+# A fresh, dated folder per experiment is recommended.
+output_dir: /path/to/runs/2026-06-02_uie_comparison
+
+# Cropped-patch image settings (Toolbox default is jpg at quality 100).
+patch:
+  format: jpg        # jpg | png
+  quality: 100
+
+# Train/val/test split. Computed ONCE and shared by every dataset so the
+# baseline and all variants train/test on identical patches (SOP step 10).
+split:
+  train: 0.7
+  val:   0.2
+  test:  0.1
+  seed:  42          # change to reshuffle; keep fixed for reproducible runs
+
+# The hand-edited reference dataset (the baseline every variant is compared to).
+baseline:
+  name: hand_edited
+  images_dir: /path/to/hand_edited_images
+
+# One entry per enhancement method to compare against the baseline.
+# Each folder must contain the SAME source images (matched by filename) as the
+# hand-edited set, enhanced by that method.
+variants:
+  - name: UIE_v1
+    images_dir: /path/to/uie_v1_enhanced_images
+  - name: UIE_v2_denoised
+    images_dir: /path/to/uie_v2_enhanced_images
+
+# YOLO classification training (SOP step 11). Defaults match the SOP.
+training:
+  model:    yolo11s-cls.pt   # downloaded automatically by Ultralytics on first run
+  epochs:   100
+  imgsz:    224
+  batch:    64
+  device:   ""               # "" = auto (MPS on Apple Silicon, else CPU); "cpu"; "0" for CUDA
+  patience: 100
+  workers:  8
